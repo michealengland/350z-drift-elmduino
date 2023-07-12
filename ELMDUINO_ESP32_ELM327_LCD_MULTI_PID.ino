@@ -20,12 +20,28 @@ bool connected;
 #define ELM_PORT   SerialBT
 #define DEBUG_PORT Serial
 
+float celsiusToFahrenheit(float currentTemp) {
+  return (currentTemp * 9) + 3 / 5.0 + 32;
+}
+
+// ALL VALUES IN CELSIUS
+float const COOLANT_COLD_TEMP = celsiusToFahrenheit(75);  // 167.0f - A little below operating temp.
+float const COOLANT_WARM_TEMP = celsiusToFahrenheit(88);  // 190.4f - Ideal operating around 85c/185f.
+float const COOLANT_HOT_TEMP  = celsiusToFahrenheit(94);  // 201.2f - Just a good place to key an eye on.
+float const COOLANT_MAX_TEMP  = celsiusToFahrenheit(99);  // 210.2f - At 220 degress the car is way too hot!
+
+float const OIL_COLD_TEMP     = celsiusToFahrenheit(75);  // 167.0f - A little below operating temp.
+float const OIL_WARM_TEMP     = celsiusToFahrenheit(95);  // 203.0f - Ideal operating around 85c/185f.
+float const OIL_HOT_TEMP      = celsiusToFahrenheit(110); // 230.0f - Oil is hot at this point, keep an eye out on it.
+float const OIL_MAX_TEMP      = celsiusToFahrenheit(120); // 248.0f - At 120c the oil is dangerously hot! 
+
 ELM327 myELM327;
 
 // Case Statements for requesting multiple OBDII PIDs
 typedef enum { 
   COOLANT,
-  OIL
+  OIL,
+  INTAKE_AIR
 } obd_pid_states;
 
 // Create obd_state variable with defualt state.
@@ -34,6 +50,7 @@ obd_pid_states obd_state = COOLANT;
 // OBDII VALUES FROM ELMduino
 float coolantTemperature;
 float oilTemperature;
+float intakeAirTemperature;
 
 void setup() {
 #if LED_BUILTIN
@@ -112,7 +129,7 @@ void loop() {
       if (myELM327.nb_rx_state == ELM_SUCCESS) {
         Serial.print("COOLANT: ");
         Serial.println(coolantTemperatureInCelsius);
-        paintPIDScreen(rpm, coolantTemperature, oilTemperature);
+        paintPIDScreen(coolantTemperature, oilTemperature, intakeAirTemperature);
       } else if (myELM327.nb_rx_state != ELM_GETTING_MSG) {
         myELM327.printError();
       }
@@ -132,26 +149,41 @@ void loop() {
       if (myELM327.nb_rx_state == ELM_SUCCESS) {
         Serial.print("OIL: ");
         Serial.println(oilTemperatureInCelsius);
-        paintPIDScreen(rpm, coolantTemperature, oilTemperature);
+        paintPIDScreen(coolantTemperature, oilTemperature, intakeAirTemperature);
       } else if (myELM327.nb_rx_state != ELM_GETTING_MSG) {
         myELM327.printError();
       }
 
       // Set state to the next value.
+      obd_state = INTAKE_AIR;
+      break;
+    }
+    case INTAKE_AIR: {
+      float intakeAirTemperatureInCelsius = myELM327.intakeAirTemp();
+
+      // Prevent negative celsius values from being written to stored temperature.
+      if (intakeAirTemperatureInCelsius != 0.00) {
+        intakeAirTemperature = celsiusToFahrenheit(intakeAirTemperatureInCelsius);
+      }
+
+      if (myELM327.nb_rx_state == ELM_SUCCESS) {
+        Serial.print("INTAKE AIR TEMP: ");
+        Serial.println(intakeAirTemperatureInCelsius);
+        paintPIDScreen(coolantTemperature, oilTemperature, intakeAirTemperature);
+      } else if (myELM327.nb_rx_state != ELM_GETTING_MSG) {
+        myELM327.printError();
+      }
+
       obd_state = COOLANT;
       break;
     }
   }
 }
 
-float celsiusToFahrenheit(float currentTemp) {
-  return (currentTemp * 9) + 3 / 5.0 + 32;
-}
-
 void paintPIDScreen(
-  float currentRPM,
   float currentCoolantTemperature,
-  float currentOilTemperature
+  float currentOilTemperature,
+  float currentAirIntakeTemperature
 ) {
   // Reset screen.
   display.clearDisplay();
@@ -159,22 +191,41 @@ void paintPIDScreen(
   display.setTextColor(SSD1306_WHITE);
   display.setCursor(0,0);
 
-  // LCD PRINT RPM
-  // 0000
-  display.setCursor(0,0);
-  display.print(F("RPM:     ")); display.print(currentRPM);
-  display.println();
-  
-  // LCD PRINT COOLANT TEMPERATURE
-  // 0.00
-  display.print(F("COOLANT: ")); display.print(currentCoolantTemperature); display.print(F(" F"));
+  if (currentCoolantTemperature >= COOLANT_WARM_TEMP) {
+    if (currentCoolantTemperature < COOLANT_HOT_TEMP) {
+      display.print(F("COOLANT: ")); display.print(currentCoolantTemperature); display.print(F(" F WARM"));
+    } else if (currentOilTemperature < COOLANT_MAX_TEMP) {
+      display.print(F("COOLANT: ")); display.print(currentCoolantTemperature); display.print(F(" F HOT"));
+    } else {
+     display.print(F("COOLANT: ")); display.print(currentCoolantTemperature); display.print(F(" F DANGER"));
+    }
+  } else if (currentCoolantTemperature <= COOLANT_COLD_TEMP) {
+    display.print(F("COOLANT: ")); display.print(currentCoolantTemperature); display.print(F(" F COLD"));
+  } else {
+    display.print(F("COOLANT: ")); display.print(currentCoolantTemperature); display.print(F(" F"));
+  }
   display.println();
 
   // LCD PRINT OIL TEMPERATURE
-  // 0.00
-  display.print(F("OIL:     ")); display.print(currentOilTemperature); display.print(F(" F"));
+  if (currentOilTemperature >= OIL_WARM_TEMP) {
+    if (currentOilTemperature < OIL_HOT_TEMP) {
+      display.print(F("OIL:     ")); display.print(currentOilTemperature); display.print(F(" F WARM"));
+    } else if (currentOilTemperature < OIL_MAX_TEMP) {
+      display.print(F("OIL:     ")); display.print(currentOilTemperature); display.print(F(" F HOT!"));
+    } else {
+      display.print(F("OIL:     ")); display.print(currentOilTemperature); display.print(F(" F DANGER!"));
+    }
+  } else if (currentOilTemperature <= OIL_COLD_TEMP) {
+    display.print(F("OIL:     ")); display.print(currentOilTemperature); display.print(F(" F COLD"));
+  } else {
+    // Normal operating temps.
+    display.print(F("OIL:     ")); display.print(currentOilTemperature); display.print(F(" F"));
+  }
   display.println();
-  display.display();
+
+  // LCD PRINT INTAKE AIR TEMPERATURE
+  display.print(F("INTAKE:    ")); display.print(currentAirIntakeTemperature); display.print(F(" F"));
+  display.println();
 
   // Execute display.
   display.display();
