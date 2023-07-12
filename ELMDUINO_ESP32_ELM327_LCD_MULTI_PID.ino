@@ -22,11 +22,6 @@ bool connected;
 
 ELM327 myELM327;
 
-// NEEDED FOR MAKING MULTIPLE PID calls at once
-// const bool DEBUG        = true;
-// const int  TIMEOUT      = 2000;
-// const bool HALT_ON_FAIL = false;
-
 // Case Statements for requesting multiple OBDII PIDs
 typedef enum { 
   COOLANT,
@@ -100,7 +95,6 @@ void setup() {
 }
 
 void loop() {
-  // RESET DISPLAY FOR GAUGES.
   if (myELM327.nb_rx_state != ELM_GETTING_MSG) {
     myELM327.printError();
   }
@@ -111,7 +105,7 @@ void loop() {
       float coolantTemperatureInCelsius = myELM327.engineCoolantTemp();
       
       // Prevent negative celsius values from being written to stored temperature.
-      if (coolantTemperatureInCelsius > 0) {
+      if (coolantTemperatureInCelsius != 0.00) {
         coolantTemperature = celsiusToFahrenheit(coolantTemperatureInCelsius);
       }
       
@@ -131,7 +125,7 @@ void loop() {
       float oilTemperatureInCelsius = myELM327.oilTemp();
 
       // Prevent negative celsius values from being written to stored temperature.
-      if (oilTemperatureInCelsius > 0) {
+      if (oilTemperatureInCelsius != 0.00) {
         oilTemperature = celsiusToFahrenheit(oilTemperatureInCelsius);
       }
 
