@@ -29,17 +29,14 @@ ELM327 myELM327;
 
 // Case Statements for requesting multiple OBDII PIDs
 typedef enum { 
-  ENG_RPM,
-  SPEED,
   COOLANT,
   OIL
 } obd_pid_states;
 
-// Create obd_state variable with defualt of ENG_RPM.
-obd_pid_states obd_state = ENG_RPM;
+// Create obd_state variable with defualt state.
+obd_pid_states obd_state = COOLANT;
 
 // OBDII VALUES FROM ELMduino
-float rpm;
 float coolantTemperature;
 float oilTemperature;
 
@@ -110,25 +107,6 @@ void loop() {
 
   // Determine which PID to get.
   switch (obd_state) {
-    case ENG_RPM: {
-      float tempRPM = myELM327.rpm();
-
-      if(tempRPM != 0.00) {
-        rpm = tempRPM;
-      }
-
-      if (myELM327.nb_rx_state == ELM_SUCCESS) {
-        Serial.print("RPM: ");
-        Serial.println(rpm);
-        paintPIDScreen(rpm, coolantTemperature, oilTemperature);
-      } else if (myELM327.nb_rx_state != ELM_GETTING_MSG) {
-        myELM327.printError();
-      }
-
-      // Set state to the next value.
-      obd_state = COOLANT;
-      break;
-    }
     case COOLANT: {
       float coolantTemperatureInCelsius = myELM327.engineCoolantTemp();
       
@@ -166,7 +144,7 @@ void loop() {
       }
 
       // Set state to the next value.
-      obd_state = ENG_RPM;
+      obd_state = COOLANT;
       break;
     }
   }
