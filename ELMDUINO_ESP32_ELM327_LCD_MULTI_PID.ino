@@ -4,6 +4,12 @@
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
+#include "arduino_secrets.h"
+
+// Make sure to update the arduino_secrets.h file with the values for your ELM327.
+// char SSID[] = SECRET_SSID; // Network name is not used since we're using mac address.
+char PASS[] = SECRET_PASS; // Bluetooth passcode
+uint8_t MAC_ADDRESS[6] = SECRET_MAC_ADRESS; // Bluetooth Mac Address
 
 // LCD screen inital setup based on Adafruit_SSD1306 128x64 example.
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
@@ -13,8 +19,6 @@
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 BluetoothSerial SerialBT;
-// Bluetooth device MAC address 66:1E:32:F3:A3:E2
-uint8_t MACaddress[6]  = {0x66, 0x1e, 0x32, 0xf3, 0xa3, 0xe2};
 bool connected;
 
 #define ELM_PORT   SerialBT
@@ -64,7 +68,7 @@ void setup() {
 #endif
 
   DEBUG_PORT.begin(115200);
-  SerialBT.setPin("1234");
+  SerialBT.setPin(PASS);
   ELM_PORT.begin("ArduHUD", true);
 
   // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
@@ -104,7 +108,7 @@ void setup() {
   // connect(MACaddress) is fast (upto 10 secs max)
   // connect(name) is slow (upto 30 secs max) as it needs and
   // often fails to connect.
-  if (! ELM_PORT.connect(MACaddress)) {
+  if (! ELM_PORT.connect(MAC_ADDRESS)) {
     DEBUG_PORT.println(F("CONNECTION FAILED: OBDII device."));
     // LCD PRINT
     display.println(F("CONNECTION FAILED:"));
