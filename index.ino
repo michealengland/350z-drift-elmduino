@@ -37,7 +37,7 @@ float const COOLANT_MAX_TEMP  = celsiusToFahrenheit(99);  // 210.2f - At 220 deg
 float const OIL_COLD_TEMP     = celsiusToFahrenheit(75);  // 167.0f - A little below operating temp.
 float const OIL_WARM_TEMP     = celsiusToFahrenheit(95);  // 203.0f - Ideal operating around 85c/185f.
 float const OIL_HOT_TEMP      = celsiusToFahrenheit(110); // 230.0f - Oil is hot at this point, keep an eye out on it.
-float const OIL_MAX_TEMP      = celsiusToFahrenheit(120); // 248.0f - At 120c the oil is dangerously hot! 
+float const OIL_MAX_TEMP      = celsiusToFahrenheit(120); // 248.0f - At 120c the oil is dangerously hot!
 
 float const INTAKE_COLD_TEMP  = celsiusToFahrenheit(75);  // 86.0f - The car is cool.
 float const INTAKE_WARM_TEMP  = celsiusToFahrenheit(88);  // 118.4f - Guesstimate of casual driving.
@@ -47,7 +47,7 @@ float const INTAKE_MAX_TEMP   = celsiusToFahrenheit(99);  // 140.0f - The car en
 ELM327 myELM327;
 
 // Case Statements for requesting multiple OBDII PIDs
-typedef enum { 
+typedef enum {
   COOLANT,
   OIL,
   INTAKE_AIR
@@ -150,7 +150,7 @@ void loop() {
       if(coolantTemperatureInCelsius > 0) {
         coolantTemperature = celsiusToFahrenheit(coolantTemperatureInCelsius);
       }
-      
+
       if (myELM327.nb_rx_state == ELM_SUCCESS) {
         Serial.print("COOLANT: ");
         Serial.println(coolantTemperatureInCelsius);
