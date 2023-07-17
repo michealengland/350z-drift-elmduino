@@ -39,10 +39,10 @@ float const OIL_WARM_TEMP     = celsiusToFahrenheit(95);  // 203.0f - Ideal oper
 float const OIL_HOT_TEMP      = celsiusToFahrenheit(110); // 230.0f - Oil is hot at this point, keep an eye out on it.
 float const OIL_MAX_TEMP      = celsiusToFahrenheit(120); // 248.0f - At 120c the oil is dangerously hot! 
 
-float const INTAKE_COLD_TEMP  = celsiusToFahrenheit(30);  // 86.0f - The car is cool.
-float const INTAKE_WARM_TEMP  = celsiusToFahrenheit(48);  // 118.4f - Guesstimate of casual driving.
-float const INTAKE_HOT_TEMP   = celsiusToFahrenheit(55);  // 131.0f - Just a good place to key an eye on.
-float const INTAKE_MAX_TEMP   = celsiusToFahrenheit(60);  // 140.0f - The car engine bay is really hot.
+float const INTAKE_COLD_TEMP  = celsiusToFahrenheit(75);  // 86.0f - The car is cool.
+float const INTAKE_WARM_TEMP  = celsiusToFahrenheit(88);  // 118.4f - Guesstimate of casual driving.
+float const INTAKE_HOT_TEMP   = celsiusToFahrenheit(94);  // 131.0f - Just a good place to key an eye on.
+float const INTAKE_MAX_TEMP   = celsiusToFahrenheit(99);  // 140.0f - The car engine bay is really hot.
 
 ELM327 myELM327;
 
