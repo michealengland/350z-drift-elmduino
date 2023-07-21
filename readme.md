@@ -1,5 +1,5 @@
 # 350z Elmduino Project
-This is a simple Arduino project based that relies on the [ELMduino library](https://github.com/PowerBroker2/ELMduino/tree/master) to help diagnose information on my 350z on the track. This should work for any car that supports OBDII.
+This is a simple Arduino project using the [ELMduino library](https://github.com/PowerBroker2/ELMduino/tree/master) to help diagnose information on my 350z on the track. This should work for any car that supports OBDII.
 
 ## Things you'll need
 1. [ESP32 Board](https://www.amazon.com/gp/product/B07WCG1PLV/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&psc=1) - I got this one, but there are other options out there. You just need bluetooth.
