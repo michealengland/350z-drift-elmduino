@@ -18,8 +18,16 @@ VDD | 3.3v
 ## Getting Started
 1. Clone the repo
 2. Select your ESP32 board and install necessary libraries
-3. Create a file called `arduino_secrets.h` in the root directory using the template below.
-4. Update the values for your MacAddress and pass code if needed.
+3. Create a file called `arduino_secrets.h` in the root directory near the `index` file using the template below.
+4. Update the values for your MacAddress and pass code if needed see "Finding the ELM327 Mac Address)".
+5. Lastly, flash the board and you're ready to try it out.
+
+## How to Run
+1. With your ESP32 flashed and secrets.sh updated. Connect the ELM327 to your car.
+2. Turn on the ignition.
+3. Power on the device Arduino device.
+4. It will begin attempting to connect. If it fails to connect try a power the device on / off (sometimes it doesn't connect the first time).
+5. If you see CONNECTION SUCCESSFUL, wait a few seconds and you should see your data soon.
 
 ```
 #define SECRET_SSID "OBD2"; // Default.
@@ -33,7 +41,7 @@ VDD | 3.3v
 ## Finding the ELM327 Mac Address:
 1. Plugin the ELM327 unit and connect to it your computers bluetooth. It should show up as "OBDII".
 2. Enter the password if it requires one. The default passcode for ELM327 bluetooth model is usually `1234`. If that doesn't work, try `12345` or `0000`.
-3. For mac users, you can find the MAC address using the command `system_profiler SPBluetoothDataType` in Terminal.
+3. For mac users, you can find the MAC address with the command `system_profiler SPBluetoothDataType` in Terminal.
 4. You should be able to spot by looking for OBDII.
 5. Once you have the MAC address, go to your bluetooth settings and forget "OBDII".
 6. Next, update the MAC address in the `arduino_secrets` file. Each pair of values will have an `0x` as seen below.
@@ -47,4 +55,5 @@ VDD | 3.3v
 - Make sure the car is started with OBDII ELM327 inserted into the port before starting the ESP32.
 - If it doesn't connect the first time, try restarting the ESP32.
 - Using the `ELM_PORT.connect(ssid)` as seen in the ELMduino ESP32 example often failed to connect and was very slow. I used the solution documented [here](https://github.com/espressif/arduino-esp32/blob/b92c58d74b151c7a3b56db4e78f2d3c90c16446f/libraries/BluetoothSerial/examples/SerialToSerialBTM/SerialToSerialBTM.ino#L27-L31) to resolve this.
-- Querying certain data together such as RPM and temperatures was a little slow. I didn't really need RPM anymore, so I removed it from my example.
+- Querying certain data together such as RPM and temperatures was a little slow. I didn't really need RPM anymore, so I removed it from my example. However, even with multiple other data types the temperatures displayed fluctuate a lot between the values I show here on this repo.
+- If you're able to connect but your values don't load for some reason, checkout the Elmduino library and try other PIDs.
