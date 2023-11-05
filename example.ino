@@ -1,5 +1,5 @@
 // This is a basic example to call RPM only.
-// Try this as index.ini
+// Try this as index.ino
 // Use Serial Monitor with 115200 baudrate set in the Arduino IDE. This should match line 41.
 
 #include "BluetoothSerial.h"
